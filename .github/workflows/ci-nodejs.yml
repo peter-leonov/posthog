@@ -43,17 +43,10 @@ jobs:
                   filter: blob:none
                   fetch-depth: 0
 
-            - uses: actions/create-github-app-token@1b10c78c7865c340bc4f6099eb2f838309f1e8c3 # v3.1.1
-              id: app-token
-              if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
-              with:
-                  client-id: ${{ secrets.GH_APP_POSTHOG_PATHS_FILTER_APP_ID }}
-                  private-key: ${{ secrets.GH_APP_POSTHOG_PATHS_FILTER_PRIVATE_KEY }}
             - uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d # v4.0.1
               id: filter
               if: github.event_name != 'push' # Run all tests on master push
               with:
-                  token: ${{ steps.app-token.outputs.token || github.token }}
                   filters: |
                       nodejs:
                         - .github/workflows/ci-nodejs.yml
@@ -121,9 +114,9 @@ jobs:
 
     lint:
         if: needs.changes.outputs.nodejs == 'true'
-        name: Node.js Code quality (depot-ubuntu-latest)
+        name: Node.js Code quality
         needs: changes
-        runs-on: depot-ubuntu-latest
+        runs-on: ubuntu-latest
         timeout-minutes: 10
         steps:
             - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -160,9 +153,9 @@ jobs:
 
     build:
         if: needs.changes.outputs.nodejs == 'true'
-        name: Node.js Build (depot-ubuntu-latest)
+        name: Node.js Build
         needs: changes
-        runs-on: depot-ubuntu-latest
+        runs-on: ubuntu-latest
         timeout-minutes: 10
         steps:
             - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
@@ -207,9 +200,9 @@ jobs:
 
     tests:
         if: needs.changes.outputs.nodejs == 'true'
-        name: Node.js Tests ${{matrix.shard}}/3 (depot-ubuntu-latest-4)
+        name: Node.js Tests ${{matrix.shard}}/3
         needs: changes
-        runs-on: depot-ubuntu-latest-4
+        runs-on: ubuntu-latest
         timeout-minutes: 30 # We know tests don't take this long
         strategy:
             fail-fast: false
@@ -425,9 +418,9 @@ jobs:
 
     rust_ingestion_e2e:
         if: needs.changes.outputs.nodejs == 'true'
-        name: Rust ingestion consumer Node API e2e (depot-ubuntu-latest-4)
+        name: Rust ingestion consumer Node API e2e
         needs: changes
-        runs-on: depot-ubuntu-latest-4
+        runs-on: ubuntu-latest
         timeout-minutes: 30
         env:
             REDIS_URL: 'redis://localhost'

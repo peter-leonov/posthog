@@ -87,3 +87,4 @@ minimumReleaseAgeExclude:
     - shiki
     - shadcn
     - '@shikijs/*'
+    - '@clickhouse/*'
